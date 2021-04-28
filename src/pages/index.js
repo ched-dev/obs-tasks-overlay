@@ -116,8 +116,7 @@ export default function Home() {
   const handleTask = useCallback((message) => {
     // message examples:
     //   !task start [taskId]
-    //   !task pause *
-    //   !task end
+    //   !task end [taskId]
     //   !task add Name of the task
     //   !task edit 3 New name of the task
     const [, rawCommand, ...args] = message.split(" ")

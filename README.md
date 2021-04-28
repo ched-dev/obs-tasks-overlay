@@ -1,6 +1,23 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# OBS Tasks
+
+> An application to show Tasks in an OBS Browser Source, controlled via Twitch chat commands (`!task add A New Task`)
+
+## To Do
+
+- [x] `!task add Task Title`
+- [x] `!task start [taskId]`
+- [ ] `!task pause [taskId]`
+- [x] `!task end [taskId]`
+- [x] `!task edit taskId New Task Title`
+- [ ] `!task move 4 3`
+- [x] `!task clear [taskId]`
+- [ ] Load from deployed server
+- [x] Saved to localStorage
+- [ ] Saved to database
 
 ## Getting Started
+
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 First, run the development server:
 
