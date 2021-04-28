@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import tmi from 'tmi.js'
 import Head from 'next/head'
-import TimeAgo from 'react-timeago'
+import TimeAgo from '../components/timeAgo'
 import shortStrings from 'react-timeago/lib/language-strings/en-short'
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
  
@@ -30,7 +30,11 @@ const streamTasks = [
 ]
 
 export default function Home() {
-  const [tasks, setTasks] = useState(streamTasks)
+  let initialTasks = []
+  if (typeof window !== 'undefined') {
+    initialTasks = JSON.parse(localStorage.getItem('obs-tasks') || '[]')
+  }
+  const [tasks, setTasks] = useState(initialTasks)
 
   const startTask = useCallback((command, taskId) => {
     const updatedTasks = [...tasks]
@@ -99,6 +103,16 @@ export default function Home() {
     setTasks(updatedTasks)
   }, [tasks])
 
+  const clearTask = useCallback((command, taskId) => {
+    // clear all
+    if (!taskId) {
+      setTasks([])
+      return
+    }
+
+    setTasks(tasks.filter((task, index) => Number(taskId) !== index + 1))
+  }, [tasks])
+
   const handleTask = useCallback((message) => {
     // message examples:
     //   !task start [taskId]
@@ -128,6 +142,9 @@ export default function Home() {
     }
     if (command === 'edit') {
       editTask(command, args[0], args.slice(1).join(" "))
+    }
+    if (command === 'clear') {
+      clearTask(command, args[0])
     }
     
     console.log(command, `// did not recognize command`, {
@@ -175,6 +192,12 @@ export default function Home() {
     return () => client.disconnect()
   }, [handleTask])
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('obs-tasks', JSON.stringify(tasks))
+    }
+  }, [tasks])
+
   return (
     <div className="h-full text-white flex">
       <Head>
@@ -182,33 +205,31 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="m-5 w-1/6 ml-auto mt-40 bg-gray-800 h-96">
+      <main className="m-5 w-1/5 ml-auto mt-36 h-96">
         <h1 className="text-xl">Stream Tasks</h1>
-        <ul className="my-5 pl-3">
+        <ul className="my-3">
+          {tasks.length === 0 && <em className="block text-center opacity-50">None yet.</em>}
           {tasks.map((task, index) => (
-            <li key={task.name} className="flex items-center mr-1">
+            <li key={task.name} className="flex items-center">
               <span className="opacity-30 mr-2">{index + 1}</span>
               {task.endTime ? (
                 <>
                   <span><i className="fas fa-check text-green-600 mr-2" /></span>
                   <span className="opacity-50">{task.name}</span>
-                  <span className="opacity-50 ml-auto">
+                  <span className="opacity-50 ml-auto whitespace-nowrap">
                     <TimeAgo
                       now={() => task.endTime}
-                      date={task.startTime}
-                      formatter={formatter}
-                      live={false}
+                      timestamp={task.startTime}
                     />
                   </span>
                 </>
               ) : (
                 <>
                   <span className={task.startTime ? 'animate-pulse' : ''}>{task.name}</span>
-                  <span className="ml-auto">
+                  <span className="ml-auto whitespace-nowrap">
                     {task.startTime && (
                       <TimeAgo
-                        date={task.startTime}
-                        formatter={formatter}
+                        timestamp={task.startTime}
                         live={true}
                       />
                     )}
