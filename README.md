@@ -1,6 +1,6 @@
-# OBS Tasks
+# OBS Tasks Overlay
 
-> An application to show Tasks in an OBS Browser Source, controlled via Twitch chat commands (`!task add A New Task`)
+> An browser application to show Tasks in an OBS Browser Source, controlled via Twitch chat commands (`!task add A New Task`)
 
 ## To Do
 
@@ -11,9 +11,36 @@
 - [x] `!task edit taskId New Task Title`
 - [ ] `!task move 4 3`
 - [x] `!task clear [taskId]`
-- [ ] Load from deployed server
-- [x] Saved to localStorage
+- [ ] Deployed
+- [x] Saved to localStorage (enabled by default)
 - [ ] Saved to database
+
+## OBS Installation
+
+Load a new Browser Source to the URL:
+
+```
+https://obs-tasks-overlay.vercel.app/?username=twitchUsername
+```
+
+Additional configuration options are available as query parameters:
+
+> allowMods=true
+Allow Mods to run the `!task` commands on your behalf.
+
+> title=Title Text
+Show a Title above the task list
+
+> scale=2
+Scale of the text on the page. Defaults to `1`, increments by `.1`. E.g. `1.4` is valid
+
+> verticalAlign=middle
+Vertically aligns the list within your OBS browser source window. Options are `top`, `center`, `middle`, `bottom`. Defaults to `top`.
+
+**Fully Configured Example URL:**
+```
+https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream Tasks&scale=2&verticalAlign=middle
+```
 
 ## Getting Started
 
