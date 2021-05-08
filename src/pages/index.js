@@ -26,7 +26,9 @@ const streamTasks = [
 ]
 
 const defaultConfig = {
-
+  username: null,
+  allowMods: false,
+  title: null
 }
 
 export default function Home() {
@@ -44,12 +46,13 @@ export default function Home() {
       ...defaultConfig,
       ...router.query
     }
+    newConfig.allowMods = ['true', '1'].includes(newConfig.allowMods)
+
     setConfig(newConfig)
-    console.log('setConfig', newConfig, config)
+    console.log('setConfig', newConfig)
   }, [router.query])
 
   useEffect(() => {
-    console.log('run config', config)
     if (!config.username) {
       setError(`Query Param Missing: A 'username' is required`)
       return
@@ -184,13 +187,11 @@ export default function Home() {
       channels: [config.username]
     })
 
-    client.connect().catch((message) => {
-      setError(`Connection Failed: ${message}`)
-    })
+    client.connect()
 
     // _promiseJoin is the "channel join" event
     client.on('_promiseJoin', (message, channel) => {
-      console.log('Channel Join:', message, channel)
+      console.log('Channel Join:', channel, message || 'Success')
       if (message === 'No response from Twitch.') {
         setError(`Channel Join Failed: ${channel}`)
       }
@@ -214,8 +215,11 @@ export default function Home() {
         }
       }
 
-      if (tags.mod) {
-        // is a moderator
+      // is a moderator
+      if (tags.mod && config.allowMods) {
+        if (cleanedMessage.toLowerCase().startsWith("!task ")) {
+          handleTask(cleanedMessage)
+        }
       }
 
       if (tags['msg-id'] === "highlighted-message") {
@@ -247,39 +251,39 @@ export default function Home() {
 
         {!error && (
           <>
-            <h1 className="text-xl">Stream Tasks</h1>
-              <ul className="my-3">
-                {tasks.length === 0 && <em className="block text-center opacity-50">None yet.</em>}
-                {tasks.map((task, index) => (
-                  <li key={task.name} className="flex items-center justify-between">
-                    <span className="opacity-30 mr-2">{index + 1}</span>
-                    {task.endTime ? (
-                      <>
-                        <span><i className="fas fa-check text-green-600 mr-2" /></span>
-                        <span className="opacity-50">{task.name}</span>
-                        <span className="opacity-50 ml-auto whitespace-nowrap">
+            {config.title && <h1 className="text-xl">{config.title}</h1>}
+            <ul className="my-3">
+              {tasks.length === 0 && <em className="block text-center opacity-50">None yet.</em>}
+              {tasks.map((task, index) => (
+                <li key={task.name} className="flex items-center justify-between">
+                  <span className="opacity-30 mr-2">{index + 1}</span>
+                  {task.endTime ? (
+                    <>
+                      <span><i className="fas fa-check text-green-600 mr-2" /></span>
+                      <span className="opacity-50">{task.name}</span>
+                      <span className="opacity-50 ml-auto whitespace-nowrap">
+                        <TimeAgo
+                          now={() => task.endTime}
+                          timestamp={task.startTime}
+                        />
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className={task.startTime ? 'animate-pulse' : ''}>{task.name}</span>
+                      <span className="ml-auto whitespace-nowrap">
+                        {task.startTime && (
                           <TimeAgo
-                            now={() => task.endTime}
                             timestamp={task.startTime}
+                            live={true}
                           />
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <span className={task.startTime ? 'animate-pulse' : ''}>{task.name}</span>
-                        <span className="ml-auto whitespace-nowrap">
-                          {task.startTime && (
-                            <TimeAgo
-                              timestamp={task.startTime}
-                              live={true}
-                            />
-                          )}
-                        </span>
-                      </>
-                    )}
-                  </li>
-                ))}
-              </ul>
+                        )}
+                      </span>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
           </>
         )}
       </main>
