@@ -4,7 +4,8 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import TimeAgo from '../components/timeAgo'
 
-let client
+let client = null
+let timeoutError = false
 
 const streamTasks = [
   {
@@ -48,10 +49,26 @@ export default function Home() {
   }
   const [tasks, setTasks] = useState(initialTasks)
   const [error, setError] = useState()
+  const [config, setConfig] = useState(defaultConfig)
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const [config, setConfig] = useState({})
 
+  // set timeoutError
   useEffect(() => {
+    timeoutError = setTimeout(() => {
+      setError(`Could not load query params`)
+    }, 3000)
+
+    return () => clearTimeout(timeoutError)
+  }, [])
+
+  // update the config from query params
+  useEffect(() => {
+    if (!Object.keys(router.query).length) {
+      // no config found
+      return
+    }
+
     const newConfig = {
       ...defaultConfig,
       ...router.query
@@ -65,6 +82,10 @@ export default function Home() {
 
   // config error checking & applying
   useEffect(() => {
+    if (loading) {
+      return
+    }
+
     if (!config.username) {
       setError(`Query Param Missing: A 'username' is required`)
       return
@@ -200,10 +221,15 @@ export default function Home() {
     })
   }, [startTask, addNewTask, editTask, endTask])
 
+  // launch client and listen for callbacks
   useEffect(() => {
+    // don't accidentally run
     if (!config.username || client) {
       return
     }
+
+    clearTimeout(timeoutError)
+    timeoutError = false
 
     client = new tmi.Client({
       connection: { reconnect: true },
@@ -214,9 +240,12 @@ export default function Home() {
 
     // _promiseJoin is the "channel join" event
     client.on('_promiseJoin', (message, channel) => {
-      console.log('Channel Join:', channel, message || 'Success')
       if (message === 'No response from Twitch.') {
         setError(`Channel Join Failed: ${channel}`)
+      }
+      else if (!message) {
+        setLoading(false)
+        console.log('Channel Join:', channel, message || 'Success')
       }
     })
 
@@ -256,6 +285,7 @@ export default function Home() {
     }
   }, [handleTask, config])
 
+  // save tasks to localstorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('obs-tasks', JSON.stringify(tasks))
@@ -269,16 +299,16 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={`m-3 w-full flex flex-col ${{
+      <main className={`m-3 w-full flex flex-col ` + {
         top: 'justify-start',
         center: 'justify-center',
         middle: 'justify-center',
         bottom: 'justify-end'
-      }[config.verticalAlign] || ''}`}>
-        {error && <p className="text-xl font-bold text-red-500">OBS Tasks Overlay Error:<br/>{error}</p>}
+      }[config.verticalAlign] || ''}>
+        {error && <p className="text-xl font-bold text-red-500 animate-fade-in">OBS Tasks Overlay Error:<br/>{error}</p>}
 
-        {!error && (
-          <>
+        {!error && !loading && (
+          <section className="animate-fade-in">
             {config.title && <h1 className="text-xl">{config.title}</h1>}
             <ul className="my-3 w-full">
               {tasks.length === 0 && <em className="block text-center opacity-50">None yet.</em>}
@@ -312,7 +342,7 @@ export default function Home() {
                 </li>
               ))}
             </ul>
-          </>
+          </section>
         )}
       </main>
     </div>

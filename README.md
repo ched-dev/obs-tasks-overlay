@@ -47,9 +47,15 @@ The task list will stretch the full width of the browser source, allowing you to
 
 Additional configuration options are available as query parameters:
 
+> username=twitchUsername
+
+**Required**
+
+The Twitch users channel to join and watch for messages. By default, only the broadcaster can run the `!task` commands.
+
 > allowMods=true
 
-Allow Mods to run the `!task` commands on your behalf. Defaults `false`.
+Allow mods to run the `!task` commands on your behalf. Defaults `false`.
 
 > title=Title Text
 
