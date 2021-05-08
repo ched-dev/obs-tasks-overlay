@@ -2,13 +2,15 @@
 
 > An browser application to show Tasks in an OBS Browser Source, controlled via Twitch chat commands (`!task add A New Task`)
 
-> https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream Tasks&scale=2&verticalAlign=middle
+> https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks&scale=2&verticalAlign=middle
+
 ![Tasks Scaled and Centered](./public/screenshots/tasks-big-screen.png)
 
-> https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream Tasks
+> https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks
+
 ![Tasks Sidebar](./public/screenshots/tasks-sidebar.png)
 
-## To Do
+## Features
 
 - [x] `!task add Task Title`
 - [x] `!task start [taskId]`
@@ -17,9 +19,9 @@
 - [x] `!task edit taskId New Task Title`
 - [ ] `!task move 4 3`
 - [x] `!task clear [taskId]`
-- [ ] Deployed
 - [x] Saved to localStorage (enabled by default)
 - [ ] Saved to database
+- [ ] Light/Dark Mode
 
 ## OBS Installation
 
@@ -32,20 +34,24 @@ https://obs-tasks-overlay.vercel.app/?username=twitchUsername
 Additional configuration options are available as query parameters:
 
 > allowMods=true
+
 Allow Mods to run the `!task` commands on your behalf.
 
 > title=Title Text
+
 Show a Title above the task list
 
 > scale=2
+
 Scale of the text on the page. Defaults to `1`, increments by `.1`. E.g. `1.4` is valid
 
 > verticalAlign=middle
+
 Vertically aligns the list within your OBS browser source window. Options are `top`, `center`, `middle`, `bottom`. Defaults to `top`.
 
 **Fully Configured Example URL:**
 ```
-https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream Tasks&scale=2&verticalAlign=middle
+https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks&scale=2&verticalAlign=middle
 ```
 
 ## Getting Started
