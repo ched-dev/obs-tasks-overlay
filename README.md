@@ -4,13 +4,19 @@
 
 
 ```
+OBS Browser Source URL: 
 https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks&scale=2&verticalAlign=middle
+Width: 800
+Height: 800
 ```
 
 ![Tasks Scaled and Centered](./public/screenshots/tasks-big-screen.png)
 
 ```
-https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks
+OBS Browser Source URL: 
+https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks&scale=1.2
+Width: 400
+Height: 400
 ```
 
 ![Tasks Sidebar](./public/screenshots/tasks-sidebar.png)
