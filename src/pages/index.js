@@ -29,7 +29,8 @@ const defaultConfig = {
   username: null,
   allowMods: false,
   title: null,
-  scale: 1
+  scale: 1,
+  verticalAlign: 'top'
 }
 
 const applyScale = (scale) => {
@@ -70,6 +71,10 @@ export default function Home() {
     }
     if (isNaN(config.scale)) {
       setError(`Query Param Error: 'scale' must be a number`)
+      return
+    }
+    if (!['top', 'center', 'middle', 'bottom'].includes(config.verticalAlign)) {
+      setError(`Query Param Error: 'verticalAlign' must be 'top' | 'center' | 'middle' | 'bottom'`)
       return
     }
 
@@ -264,13 +269,18 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="m-3 w-full">
+      <main className={`m-3 w-full flex flex-col ${{
+        top: 'justify-start',
+        center: 'justify-center',
+        middle: 'justify-center',
+        bottom: 'justify-end'
+      }[config.verticalAlign] || ''}`}>
         {error && <p className="text-xl font-bold text-red-500">OBS Tasks Overlay Error:<br/>{error}</p>}
 
         {!error && (
           <>
             {config.title && <h1 className="text-xl">{config.title}</h1>}
-            <ul className="my-3">
+            <ul className="my-3 w-full">
               {tasks.length === 0 && <em className="block text-center opacity-50">None yet.</em>}
               {tasks.map((task, index) => (
                 <li key={task.name} className="flex items-center justify-between">
