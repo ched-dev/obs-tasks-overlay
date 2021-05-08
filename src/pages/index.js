@@ -28,7 +28,16 @@ const streamTasks = [
 const defaultConfig = {
   username: null,
   allowMods: false,
-  title: null
+  title: null,
+  scale: 1
+}
+
+const applyScale = (scale) => {
+  const el = document.querySelector('html')
+  
+  el.style = `
+    font-size: ${scale}em;
+  `
 }
 
 export default function Home() {
@@ -47,16 +56,25 @@ export default function Home() {
       ...router.query
     }
     newConfig.allowMods = ['true', '1'].includes(newConfig.allowMods)
+    newConfig.scale = Number(newConfig.scale)
 
     setConfig(newConfig)
     console.log('setConfig', newConfig)
   }, [router.query])
 
+  // config error checking & applying
   useEffect(() => {
     if (!config.username) {
       setError(`Query Param Missing: A 'username' is required`)
       return
     }
+    if (isNaN(config.scale)) {
+      setError(`Query Param Error: 'scale' must be a number`)
+      return
+    }
+
+    // apply config
+    applyScale(config.scale)
 
     setError(null)
   }, [config])
