@@ -2,6 +2,12 @@
 
 > An browser application to show Tasks in an OBS Browser Source, controlled via Twitch chat commands (`!task add A New Task`)
 
+> https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream Tasks&scale=2&verticalAlign=middle
+![Tasks Scaled and Centered](./public/screenshots/tasks-big-screen.png)
+
+> https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream Tasks
+![Tasks Sidebar](./public/screenshots/tasks-sidebar.png)
+
 ## To Do
 
 - [x] `!task add Task Title`
