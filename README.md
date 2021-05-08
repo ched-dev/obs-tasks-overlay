@@ -2,11 +2,16 @@
 
 > An browser application to show Tasks in an OBS Browser Source, controlled via Twitch chat commands (`!task add A New Task`)
 
-> https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks&scale=2&verticalAlign=middle
+
+```
+https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks&scale=2&verticalAlign=middle
+```
 
 ![Tasks Scaled and Centered](./public/screenshots/tasks-big-screen.png)
 
-> https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks
+```
+https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks
+```
 
 ![Tasks Sidebar](./public/screenshots/tasks-sidebar.png)
 
@@ -21,7 +26,8 @@
 - [x] `!task clear [taskId]`
 - [x] Saved to localStorage (enabled by default)
 - [ ] Saved to database
-- [ ] Light/Dark Mode
+- [x] Configuration: Allow Mods, Title Text, Scale, Vertical Align
+- [ ] Configuration: Colors, Font Family
 
 ## OBS Installation
 
@@ -30,6 +36,8 @@ Load a new Browser Source to the URL:
 ```
 https://obs-tasks-overlay.vercel.app/?username=twitchUsername
 ```
+
+The task list will stretch the full width of the browser source, allowing you to create it at your desired size.
 
 Additional configuration options are available as query parameters:
 
