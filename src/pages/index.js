@@ -1,15 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import tmi from 'tmi.js'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import TimeAgo from '../components/timeAgo'
-import shortStrings from 'react-timeago/lib/language-strings/en-short'
-import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
- 
-const formatter = buildFormatter(shortStrings)
 
-const streamInfo = {
-  startTime: 1619399058463
-}
+let client
+
 const streamTasks = [
   {
     name: "Create Next.js App with Tailwind",
@@ -29,12 +25,38 @@ const streamTasks = [
   }
 ]
 
+const defaultConfig = {
+
+}
+
 export default function Home() {
   let initialTasks = []
   if (typeof window !== 'undefined') {
     initialTasks = JSON.parse(localStorage.getItem('obs-tasks') || '[]')
   }
   const [tasks, setTasks] = useState(initialTasks)
+  const [error, setError] = useState()
+  const router = useRouter()
+  const [config, setConfig] = useState({})
+
+  useEffect(() => {
+    const newConfig = {
+      ...defaultConfig,
+      ...router.query
+    }
+    setConfig(newConfig)
+    console.log('setConfig', newConfig, config)
+  }, [router.query])
+
+  useEffect(() => {
+    console.log('run config', config)
+    if (!config.username) {
+      setError(`Query Param Missing: A 'username' is required`)
+      return
+    }
+
+    setError(null)
+  }, [config])
 
   const startTask = useCallback((command, taskId) => {
     const updatedTasks = [...tasks]
@@ -153,15 +175,28 @@ export default function Home() {
   }, [startTask, addNewTask, editTask, endTask])
 
   useEffect(() => {
-    const client = new tmi.Client({
-      connection: { reconnect: true },
-      channels: [ 'ched_dev' ]
-    });
+    if (!config.username || client) {
+      return
+    }
 
-    client.connect();
+    client = new tmi.Client({
+      connection: { reconnect: true },
+      channels: [config.username]
+    })
+
+    client.connect().catch((message) => {
+      setError(`Connection Failed: ${message}`)
+    })
+
+    // _promiseJoin is the "channel join" event
+    client.on('_promiseJoin', (message, channel) => {
+      console.log('Channel Join:', message, channel)
+      if (message === 'No response from Twitch.') {
+        setError(`Channel Join Failed: ${channel}`)
+      }
+    })
 
     client.on('message', (channel, tags, message, self) => {
-      // "Alca: Hello, World!"
       console.log(`${tags['display-name']}: ${message}`);
       console.log({
         channel,
@@ -172,8 +207,8 @@ export default function Home() {
 
       const cleanedMessage = message.trim()
 
-      // is me
-      if (tags.username === "ched_dev") {
+      // is broadcaster
+      if (tags.username === config.username) {
         if (cleanedMessage.toLowerCase().startsWith("!task ")) {
           handleTask(cleanedMessage)
         }
@@ -188,8 +223,11 @@ export default function Home() {
       }
     });
 
-    return () => client.disconnect()
-  }, [handleTask])
+    return () => {
+      client.disconnect()
+      client = null
+    }
+  }, [handleTask, config])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -200,44 +238,50 @@ export default function Home() {
   return (
     <div className="h-full text-white flex">
       <Head>
-        <title>Create Next App</title>
+        <title>OBS Tasks Overlay</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="m-5 w-1/5 ml-auto mt-36 h-96">
-        <h1 className="text-xl">Stream Tasks</h1>
-        <ul className="my-3">
-          {tasks.length === 0 && <em className="block text-center opacity-50">None yet.</em>}
-          {tasks.map((task, index) => (
-            <li key={task.name} className="flex items-center">
-              <span className="opacity-30 mr-2">{index + 1}</span>
-              {task.endTime ? (
-                <>
-                  <span><i className="fas fa-check text-green-600 mr-2" /></span>
-                  <span className="opacity-50">{task.name}</span>
-                  <span className="opacity-50 ml-auto whitespace-nowrap">
-                    <TimeAgo
-                      now={() => task.endTime}
-                      timestamp={task.startTime}
-                    />
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className={task.startTime ? 'animate-pulse' : ''}>{task.name}</span>
-                  <span className="ml-auto whitespace-nowrap">
-                    {task.startTime && (
-                      <TimeAgo
-                        timestamp={task.startTime}
-                        live={true}
-                      />
+      <main className="m-3 w-full">
+        {error && <p className="text-xl font-bold text-red-500">OBS Tasks Overlay Error:<br/>{error}</p>}
+
+        {!error && (
+          <>
+            <h1 className="text-xl">Stream Tasks</h1>
+              <ul className="my-3">
+                {tasks.length === 0 && <em className="block text-center opacity-50">None yet.</em>}
+                {tasks.map((task, index) => (
+                  <li key={task.name} className="flex items-center justify-between">
+                    <span className="opacity-30 mr-2">{index + 1}</span>
+                    {task.endTime ? (
+                      <>
+                        <span><i className="fas fa-check text-green-600 mr-2" /></span>
+                        <span className="opacity-50">{task.name}</span>
+                        <span className="opacity-50 ml-auto whitespace-nowrap">
+                          <TimeAgo
+                            now={() => task.endTime}
+                            timestamp={task.startTime}
+                          />
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className={task.startTime ? 'animate-pulse' : ''}>{task.name}</span>
+                        <span className="ml-auto whitespace-nowrap">
+                          {task.startTime && (
+                            <TimeAgo
+                              timestamp={task.startTime}
+                              live={true}
+                            />
+                          )}
+                        </span>
+                      </>
                     )}
-                  </span>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
+                  </li>
+                ))}
+              </ul>
+          </>
+        )}
       </main>
     </div>
   )
