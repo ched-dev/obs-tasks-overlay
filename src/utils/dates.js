@@ -26,6 +26,8 @@ export default {
       minutes = Math.floor(minutes)
       remainingSeconds -= MINUTE * minutes
       formattedTime += `${minutes}m `
+    } else {
+      formattedTime += `0m `
     }
 
     return formattedTime.trim()

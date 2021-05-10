@@ -31,9 +31,9 @@ Height: 400
 - [ ] `!task move 4 3`
 - [x] `!task clear [taskId]`
 - [x] Saved to localStorage (enabled by default)
-- [ ] Saved to database
 - [x] Configuration: Allow Mods, Title Text, Scale, Vertical Align
 - [ ] Configuration: Colors, Font Family
+- [ ] Configuration UI
 
 ## OBS Installation
 
