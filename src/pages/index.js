@@ -107,7 +107,7 @@ export default function Home() {
 
   const startTask = useCallback((command, taskId) => {
     const updatedTasks = [...tasks]
-    const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => !t.startTime)
+    const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => !t.endTime)
     
     if (task.startTime || task.endTime) {
       console.log(command, '// task already started or ended, ignoring command')
