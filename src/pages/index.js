@@ -103,7 +103,7 @@ export default function Home() {
     applyScale(config.scale)
 
     setError(null)
-  }, [config])
+  }, [config, loading])
 
   const startTask = useCallback((command, taskId) => {
     const updatedTasks = [...tasks]
