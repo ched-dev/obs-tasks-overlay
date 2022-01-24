@@ -215,6 +215,33 @@ export default function Home() {
     setTasks(updatedTasks)
   }, [tasks])
 
+  const sortTask = useCallback((command) => {
+    // 1: all completed tasks
+    const completedTasks = []
+    // 2: in progress tasks
+    const inProgressTasks = []
+    // 3: non-started tasks
+    const toDoTasks = []
+
+    tasks.forEach((task) => {
+      if (task.endTime) {
+        completedTasks.push(task)
+      }
+      else if (task.startTime) {
+        inProgressTasks.push(task)
+      }
+      else {
+        toDoTasks.push(task)
+      }
+    })
+
+    setTasks(
+      completedTasks
+      .concat(inProgressTasks)
+      .concat(toDoTasks)
+    )
+  }, [tasks])
+
   const clearTask = useCallback((command, taskId) => {
     // clear all
     if (!taskId) {
@@ -260,6 +287,10 @@ export default function Home() {
     }
     if (command === 'move' || command === 'swap') {
       moveTask(command, args[0], args[1])
+      return
+    }
+    if (command === 'sort') {
+      sortTask(command)
       return
     }
     if (command === 'clear') {
