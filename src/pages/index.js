@@ -110,6 +110,11 @@ export default function Home() {
   const startTask = useCallback((command, taskId) => {
     const updatedTasks = [...tasks]
     const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => !t.endTime)
+
+    if (!task) {
+      console.error(command, 'Could not find a task to start', taskId)
+      return
+    }
     
     if (task.startTime || task.endTime) {
       console.log(command, '// task already started or ended, ignoring command')
@@ -121,12 +126,20 @@ export default function Home() {
     setTasks(updatedTasks)
   }, [tasks])
 
+  const nextTask = useCallback((command, taskId) => {
+    // end any task in progress
+    endTask(command, taskId)
+
+    // start next available task or use taskId
+    startTask(command, taskId)
+  }, [tasks])
+
   const endTask = useCallback((command, taskId) => {
     const updatedTasks = [...tasks]
     const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => t.startTime && !t.endTime)
 
     if (!task) {
-      console.log(command, `// task ${taskId} does not exist`)
+      console.error(command, 'Could not find a task to end', taskId)
       return
     }
 
@@ -212,6 +225,10 @@ export default function Home() {
     }
     if (command === 'edit') {
       editTask(command, args[0], args.slice(1).join(" "))
+    }
+    if (command === 'next') {
+      nextTask(command, args[0])
+      return
     }
     if (command === 'clear') {
       clearTask(command, args[0])
