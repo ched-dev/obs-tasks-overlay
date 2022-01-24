@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import tmi from 'tmi.js'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -8,20 +8,20 @@ let client = null
 let timeoutError = false
 
 const streamTasks = [
-  {
+  { // completed
     name: "Create Next.js App with Tailwind",
     startTime: 1619399058463,
     endTime: 1619400608599
   },
-  {
+  { // in progress
     name: "Load up screen in OBS",
-    startTime: 1619400608599,
-    endTime: 1619401242030
+    startTime: 1619400608599
   },
-  {
-    name: "Add Task functionality"
+  { // paused
+    name: "Add Task functionality",
+    accumulatedTime: 180000
   },
-  {
+  { // to do
     name: "Chat commands"
   }
 ]
@@ -107,7 +107,7 @@ export default function Home() {
     setError(null)
   }, [config, loading])
 
-  const startTask = useCallback((command, taskId) => {
+  const startTask = (command, taskId) => {
     const updatedTasks = [...tasks]
     const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => !t.endTime)
 
@@ -128,17 +128,17 @@ export default function Home() {
     }
     console.log(command, '// starting new task', task)
     setTasks(updatedTasks)
-  }, [tasks])
+  }
 
-  const nextTask = useCallback((command, taskId) => {
+  const nextTask = (command, taskId) => {
     // end any task in progress
-    endTask(command, taskId)
+    endTask(command)
 
     // start next available task or use taskId
     startTask(command, taskId)
-  }, [tasks])
+  }
 
-  const pauseTask = useCallback((command, taskId) => {
+  const pauseTask = (command, taskId) => {
     const updatedTasks = [...tasks]
     const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => t.startTime && !t.endTime)
 
@@ -162,9 +162,9 @@ export default function Home() {
       task
     })
     setTasks(updatedTasks)
-  }, [tasks])
+  }
 
-  const endTask = useCallback((command, taskId) => {
+  const endTask = (command, taskId) => {
     const updatedTasks = [...tasks]
     const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => t.startTime && !t.endTime)
 
@@ -191,9 +191,9 @@ export default function Home() {
       task
     })
     setTasks(updatedTasks)
-  }, [tasks])
+  }
 
-  const addNewTask = useCallback((command, name) => {
+  const addNewTask = (command, name) => {
     if (command === "add") {
       setTasks([
         ...tasks,
@@ -202,9 +202,9 @@ export default function Home() {
         }
       ])
     }
-  }, [tasks])
+  }
 
-  const editTask = useCallback((command, taskId, name) => {
+  const editTask = (command, taskId, name) => {
     const updatedTasks = [...tasks]
     const task = taskId ? updatedTasks[taskId - 1] : false
 
@@ -219,9 +219,9 @@ export default function Home() {
       task
     })
     setTasks(updatedTasks)
-  }, [tasks])
+  }
 
-  const moveTask = useCallback((command, fromTaskId, toTaskId) => {
+  const moveTask = (command, fromTaskId, toTaskId) => {
     const fromTask = tasks.find((t, i) => i+1 === Number(fromTaskId))
 
     if (!fromTask) {
@@ -247,9 +247,9 @@ export default function Home() {
       return task
     })
     setTasks(updatedTasks)
-  }, [tasks])
+  }
 
-  const sortTask = useCallback((command) => {
+  const sortTask = (command) => {
     // 1: all completed tasks
     const completedTasks = []
     // 2: in progress tasks
@@ -274,9 +274,9 @@ export default function Home() {
       .concat(inProgressTasks)
       .concat(toDoTasks)
     )
-  }, [tasks])
+  }
 
-  const resetTask = useCallback((command, taskId) => {
+  const resetTask = (command, taskId) => {
     const task = tasks[taskId - 1]
 
     if (!task) {
@@ -285,9 +285,9 @@ export default function Home() {
     }
 
     setTasks(tasks.map((t, index) => Number(taskId) === index + 1 ? ({ name: task.name }) : t))
-  }, [tasks])
+  }
 
-  const clearTask = useCallback((command, taskId) => {
+  const clearTask = (command, taskId) => {
     // clear all completed
     if (!taskId) {
       setTasks(tasks.filter(task => !task.endTime))
@@ -295,9 +295,9 @@ export default function Home() {
     }
 
     setTasks(tasks.filter((task, index) => Number(taskId) !== index + 1))
-  }, [tasks])
+  }
 
-  const handleTask = useCallback((message) => {
+  const handleTask = (message) => {
     // message examples:
     //   !task start [taskId]
     //   !task end [taskId]
@@ -355,7 +355,10 @@ export default function Home() {
       command,
       args
     })
-  }, [startTask, addNewTask, editTask, endTask])
+  }
+
+  const triggerTask = useRef(handleTask);
+  triggerTask.current = handleTask
 
   // launch client and listen for callbacks
   useEffect(() => {
@@ -403,16 +406,17 @@ export default function Home() {
           tags.mod && config.allowMods
         ) {
         if (cleanedMessage.toLowerCase().startsWith(`${config.command} `)) {
-          handleTask(cleanedMessage)
+          triggerTask.current(cleanedMessage)
         }
       }
     });
 
     return () => {
+      console.log("DISCONNECT")
       client.disconnect()
       client = null
     }
-  }, [handleTask, config])
+  }, [config])
 
   // save tasks to localstorage
   useEffect(() => {
