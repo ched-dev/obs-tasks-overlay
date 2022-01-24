@@ -187,6 +187,34 @@ export default function Home() {
     setTasks(updatedTasks)
   }, [tasks])
 
+  const moveTask = useCallback((command, fromTaskId, toTaskId) => {
+    const fromTask = tasks.find((t, i) => i+1 === Number(fromTaskId))
+
+    if (!fromTask) {
+      console.log(message, `Could not find fromTaskId ${fromTaskId}`)
+      return
+    }
+
+    const toTask = tasks.find((t, i) => i+1 === Number(toTaskId))
+
+    if (!toTask) {
+      console.log(message, `Could not find toTaskId ${toTaskId}`)
+      return
+    }
+
+    const updatedTasks = tasks.map((task, index) => {
+      if (index + 1 === Number(fromTaskId)) {
+        return toTask
+      }
+      if (index + 1 === Number(toTaskId)) {
+        return fromTask
+      }
+
+      return task
+    })
+    setTasks(updatedTasks)
+  }, [tasks])
+
   const clearTask = useCallback((command, taskId) => {
     // clear all
     if (!taskId) {
@@ -228,6 +256,10 @@ export default function Home() {
     }
     if (command === 'next') {
       nextTask(command, args[0])
+      return
+    }
+    if (command === 'move' || command === 'swap') {
+      moveTask(command, args[0], args[1])
       return
     }
     if (command === 'clear') {

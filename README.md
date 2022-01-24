@@ -29,7 +29,7 @@ Height: 400
 - [x] `!task next [taskId]` ends current task, starts taskId or next available task
 - [x] `!task end [taskId]` ends current task
 - [x] `!task edit taskId New Task Title`
-- [ ] `!task move 4 3` or `!task swap 4 3` swaps task from #4 to #3
+- [x] `!task move 4 3` or `!task swap 4 3` swaps task from #4 to #3
 - [x] `!task clear [taskId]` removes taskId or ALL from list
 - [x] Saved to localStorage (enabled by default)
 - [x] Configuration: Command Name, Allow Mods, Title Text, Scale, Vertical Align
