@@ -25,13 +25,13 @@ Height: 400
 
 - [x] `!task add Task Title` adds task to end of list
 - [x] `!task start [taskId]` starts taskId or next available task
-- [ ] `!task pause [taskId]` pauses current task
+- [x] `!task pause [taskId]` pauses current task
 - [x] `!task next [taskId]` ends current task, starts taskId or next available task
 - [x] `!task end [taskId]` ends current task
 - [x] `!task edit taskId New Task Title`
 - [x] `!task move 4 3` or `!task swap 4 3` swaps task from #4 to #3
 - [x] `!task sort` sorts the tasks by completed, in progress, remaining
-- [x] `!task clear [taskId]` removes taskId or ALL from list
+- [x] `!task clear [taskId]` removes taskId or all completed tasks from list
 - [x] Saved to localStorage (enabled by default)
 - [x] Configuration: Command Name, Allow Mods, Title Text, Scale, Vertical Align
 - [ ] Configuration: Colors, Font Family

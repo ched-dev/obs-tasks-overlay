@@ -112,7 +112,7 @@ export default function Home() {
     const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => !t.endTime)
 
     if (!task) {
-      console.error(command, 'Could not find a task to start', taskId)
+      console.error(command, '// could not find a task to start, ignoring command', taskId)
       return
     }
     
@@ -122,6 +122,10 @@ export default function Home() {
     }
 
     task.startTime = Date.now()
+    if (task.accumulatedTime) {
+      task.startTime -= task.accumulatedTime
+      delete task.accumulatedTime
+    }
     console.log(command, '// starting new task', task)
     setTasks(updatedTasks)
   }, [tasks])
@@ -134,13 +138,43 @@ export default function Home() {
     startTask(command, taskId)
   }, [tasks])
 
+  const pauseTask = useCallback((command, taskId) => {
+    const updatedTasks = [...tasks]
+    const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => t.startTime && !t.endTime)
+
+    if (!task) {
+      console.log(command, '// could not find a task to pause, ignoring command', taskId)
+      return
+    }
+
+    if (!task.startTime) {
+      console.log(command, `// task has not been started`, {
+        taskId,
+        task
+      })
+      return
+    }
+
+    task.accumulatedTime = Date.now() - task.startTime
+    delete task.startTime
+    console.log(command, `// pausing task`, {
+      taskId,
+      task
+    })
+    setTasks(updatedTasks)
+  }, [tasks])
+
   const endTask = useCallback((command, taskId) => {
     const updatedTasks = [...tasks]
     const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => t.startTime && !t.endTime)
 
     if (!task) {
-      console.error(command, 'Could not find a task to end', taskId)
+      console.log(command, '// could not find a task to end', taskId)
       return
+    }
+
+    if (task.accumulatedTime) {
+      task.startTime = Date.now() - task.accumulatedTime
     }
 
     if (!task.startTime) {
@@ -243,9 +277,9 @@ export default function Home() {
   }, [tasks])
 
   const clearTask = useCallback((command, taskId) => {
-    // clear all
+    // clear all completed
     if (!taskId) {
-      setTasks([])
+      setTasks(tasks.filter(task => !task.endTime))
       return
     }
 
@@ -272,6 +306,10 @@ export default function Home() {
     }
     if (command === 'add') {
       addNewTask(command, args.join(" "))
+      return
+    }
+    if (command === 'pause') {
+      pauseTask(command, args[0])
       return
     }
     if (command === 'end') {
@@ -403,12 +441,18 @@ export default function Home() {
                     </>
                   ) : (
                     <>
-                      <span className={task.startTime ? 'animate-pulse' : ''}>{task.name}</span>
-                      <span className="ml-auto whitespace-nowrap">
+                      <span className={task.startTime ? 'animate-pulse' : ''}>{task.name}{task.accumulatedTime ? <span className="text-xs indent-2 italic opacity-50"> paused</span> : ""}</span>
+                      <span className={`ml-auto whitespace-nowrap ${task.accumulatedTime ? "italic" : ""}`}>
                         {task.startTime && (
                           <TimeAgo
                             timestamp={task.startTime}
                             live={true}
+                          />
+                        )}
+                        {task.accumulatedTime && (
+                          <TimeAgo
+                            now={() => Date.now() + task.accumulatedTime}
+                            timestamp={Date.now()}
                           />
                         )}
                       </span>
