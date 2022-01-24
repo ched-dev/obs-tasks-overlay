@@ -5,7 +5,7 @@
 
 ```
 OBS Browser Source URL: 
-https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks&scale=2&verticalAlign=middle
+https://obs-tasks-overlay.vercel.app/?channelName=ched_dev&title=Stream%20Tasks&scale=2&verticalAlign=middle
 Width: 800
 Height: 800
 ```
@@ -14,7 +14,7 @@ Height: 800
 
 ```
 OBS Browser Source URL: 
-https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks&scale=1.2
+https://obs-tasks-overlay.vercel.app/?channelName=ched_dev&title=Stream%20Tasks&scale=1.2
 Width: 400
 Height: 400
 ```
@@ -40,18 +40,22 @@ Height: 400
 Load a new Browser Source to the URL:
 
 ```
-https://obs-tasks-overlay.vercel.app/?username=twitchUsername
+https://obs-tasks-overlay.vercel.app/?channelName=twitchUsername
 ```
 
 The task list will stretch the full width of the browser source, allowing you to create it at your desired size.
 
 Additional configuration options are available as query parameters:
 
-> username=twitchUsername
+> channelName=twitchUsername
 
 **Required**
 
-The Twitch users channel to join and watch for messages. By default, only the broadcaster can run the `!task` commands.
+The Twitch channel chat to join and watch for messages. By default, only the broadcaster can run the `!task` commands.
+
+> command=!task
+
+Set the command you wish to listen for. We use `!task` by default. No spaces allowed in command.
 
 > allowMods=true
 
@@ -71,7 +75,7 @@ Vertically aligns the list within your OBS browser source window. Options are `t
 
 **Fully Configured Example URL:**
 ```
-https://obs-tasks-overlay.vercel.app/?username=ched_dev&title=Stream%20Tasks&scale=2&verticalAlign=middle
+https://obs-tasks-overlay.vercel.app/?channelName=ched_dev&title=Stream%20Tasks&scale=2&verticalAlign=middle
 ```
 
 ## Getting Setup for Development

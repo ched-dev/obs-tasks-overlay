@@ -27,7 +27,8 @@ const streamTasks = [
 ]
 
 const defaultConfig = {
-  username: null,
+  command: "!task",
+  channelName: null,
   allowMods: false,
   title: null,
   scale: 1,
@@ -75,6 +76,7 @@ export default function Home() {
     }
     newConfig.allowMods = ['true', '1'].includes(newConfig.allowMods)
     newConfig.scale = Number(newConfig.scale)
+    newConfig.command = newConfig.command.trim()
 
     setConfig(newConfig)
     console.log('setConfig', newConfig)
@@ -86,8 +88,8 @@ export default function Home() {
       return
     }
 
-    if (!config.username) {
-      setError(`Query Param Missing: A 'username' is required`)
+    if (!config.channelName) {
+      setError(`Query Param Missing: A 'channelName' is required`)
       return
     }
     if (isNaN(config.scale)) {
@@ -224,7 +226,7 @@ export default function Home() {
   // launch client and listen for callbacks
   useEffect(() => {
     // don't accidentally run
-    if (!config.username || client) {
+    if (!config.channelName || client) {
       return
     }
 
@@ -233,7 +235,7 @@ export default function Home() {
 
     client = new tmi.Client({
       connection: { reconnect: true },
-      channels: [config.username]
+      channels: [config.channelName]
     })
 
     client.connect()
@@ -260,22 +262,15 @@ export default function Home() {
 
       const cleanedMessage = message.trim()
 
-      // is broadcaster
-      if (tags.username === config.username) {
-        if (cleanedMessage.toLowerCase().startsWith("!task ")) {
+      if (
+          // is broadcaster
+          tags.badges && tags.badges.broadcaster ||
+          // is a moderator and mods allowed
+          tags.mod && config.allowMods
+        ) {
+        if (cleanedMessage.toLowerCase().startsWith(`${config.command} `)) {
           handleTask(cleanedMessage)
         }
-      }
-
-      // is a moderator
-      if (tags.mod && config.allowMods) {
-        if (cleanedMessage.toLowerCase().startsWith("!task ")) {
-          handleTask(cleanedMessage)
-        }
-      }
-
-      if (tags['msg-id'] === "highlighted-message") {
-        // is a highlighted message
       }
     });
 
