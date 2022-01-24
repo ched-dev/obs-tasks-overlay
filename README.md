@@ -31,6 +31,7 @@ Height: 400
 - [x] `!task edit taskId New Task Title`
 - [x] `!task move 4 3` or `!task swap 4 3` swaps task from #4 to #3
 - [x] `!task sort` sorts the tasks by completed, in progress, remaining
+- [x] `!task reset taskId` resets the task to incomplete with no time
 - [x] `!task clear [taskId]` removes taskId or all completed tasks from list
 - [x] Saved to localStorage (enabled by default)
 - [x] Configuration: Command Name, Allow Mods, Title Text, Scale, Vertical Align

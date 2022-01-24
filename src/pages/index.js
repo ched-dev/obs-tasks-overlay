@@ -276,6 +276,17 @@ export default function Home() {
     )
   }, [tasks])
 
+  const resetTask = useCallback((command, taskId) => {
+    const task = tasks[taskId - 1]
+
+    if (!task) {
+      console.log(command, "// could not find task", taskId)
+      return
+    }
+
+    setTasks(tasks.map((t, index) => Number(taskId) === index + 1 ? ({ name: task.name }) : t))
+  }, [tasks])
+
   const clearTask = useCallback((command, taskId) => {
     // clear all completed
     if (!taskId) {
@@ -331,8 +342,13 @@ export default function Home() {
       sortTask(command)
       return
     }
+    if (command === 'reset') {
+      resetTask(command, args[0])
+      return
+    }
     if (command === 'clear') {
       clearTask(command, args[0])
+      return
     }
     
     console.log(command, `// did not recognize command`, {
