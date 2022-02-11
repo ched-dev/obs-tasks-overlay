@@ -442,6 +442,13 @@ export default function Home() {
     }
   }, [title])
 
+  const getTaskStatus = (task) => ({
+    isInProgress: !task.endTime && task.startTime,
+    isPaused: task.accumulatedTime,
+    isCompleted: task.endTime,
+    isToDo: !task.endTime && !task.startTime && !task.accumulatedTime
+  })
+
   return (
     <div className="h-full text-white flex">
       <Head>
@@ -462,41 +469,69 @@ export default function Home() {
             <h1 className="text-xl">{title || "Stream Tasks"}</h1>
             <ul className="my-3 w-full">
               {tasks.length === 0 && <em className="block text-center opacity-50">None yet.</em>}
-              {tasks.map((task, index) => (
-                <li key={task.name} className="flex items-center justify-between">
-                  <span className="opacity-30 mr-2">{index + 1}</span>
-                  {task.endTime ? (
-                    <>
-                      <span><i className="fas fa-check text-green-600 mr-2" /></span>
-                      <span className="opacity-50">{task.name}</span>
-                      <span className="opacity-50 ml-auto whitespace-nowrap">
-                        <TimeAgo
-                          now={() => task.endTime}
-                          timestamp={task.startTime}
-                        />
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span className={task.startTime ? 'animate-pulse' : ''}>{task.name}{task.accumulatedTime ? <span className="text-xs indent-2 italic opacity-50"> paused</span> : ""}</span>
-                      <span className={`ml-auto whitespace-nowrap ${task.accumulatedTime ? "italic" : ""}`}>
-                        {task.startTime && (
+              {tasks.map((task, index) => {
+                const status = getTaskStatus(task)
+                const taskId = index + 1
+
+                return (
+                  <li key={task.name} className="flex items-center justify-between">
+                    <span className="status-icon">
+                      {status.isToDo && (
+                        <span><i className="far fa-circle text-gray-700 mr-2" /></span>
+                      )}
+                      {status.isInProgress && (
+                        <span><i className="fas fa-circle text-red-700 mr-2 animate-pulse" /></span>
+                      )}
+                      {status.isCompleted && (
+                        <span><i className="fas fa-check text-green-600 mr-2" /></span>
+                      )}
+                      {status.isPaused && (
+                        <span><i className="far fa-pause-circle text-gray-700 mr-2" /></span>
+                      )}
+                    </span>
+                    <span className="opacity-30 mr-2">{taskId}</span>
+                    {status.isToDo && (
+                      <>
+                        <span>{task.name}</span>
+                        <span className="ml-auto whitespace-nowrap"></span>
+                      </>
+                    )}
+                    {status.isInProgress && (
+                      <>
+                        <span className="animate-pulse">{task.name}</span>
+                        <span className="ml-auto whitespace-nowrap">
                           <TimeAgo
                             timestamp={task.startTime}
                             live={true}
                           />
-                        )}
-                        {task.accumulatedTime && (
+                        </span>
+                      </>
+                    )}
+                    {status.isCompleted && (
+                      <>
+                        <span className="opacity-50">{task.name}</span>
+                        <span className="opacity-50 ml-auto whitespace-nowrap">
+                          <TimeAgo
+                            now={() => task.endTime}
+                            timestamp={task.startTime}
+                          />
+                        </span>
+                      </>
+                    )}
+                    {status.isPaused && (
+                      <>
+                        <span>{task.name}</span>
+                        <span className="ml-auto whitespace-nowrap">
                           <TimeAgo
                             now={() => Date.now() + task.accumulatedTime}
                             timestamp={Date.now()}
                           />
-                        )}
-                      </span>
-                    </>
-                  )}
-                </li>
-              ))}
+                        </span>
+                      </>
+                    )}
+                  </li>
+                )
+              })}
             </ul>
           </section>
         )}
