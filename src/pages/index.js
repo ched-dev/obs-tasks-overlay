@@ -3,6 +3,7 @@ import tmi from 'tmi.js'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import TimeAgo from '../components/timeAgo'
+import taskHandlers from '../taskHandlers'
 
 let client = null
 let timeoutError = false
@@ -109,200 +110,6 @@ export default function Home() {
     setError(null)
   }, [config, loading])
 
-  const startTask = (command, taskId) => {
-    const updatedTasks = [...tasks]
-    const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => !t.endTime)
-
-    if (!task) {
-      console.error(command, '// could not find a task to start, ignoring command', taskId)
-      return
-    }
-    
-    if (task.startTime || task.endTime) {
-      console.log(command, '// task already started or ended, ignoring command')
-      return
-    }
-
-    task.startTime = Date.now()
-    if (task.accumulatedTime) {
-      task.startTime -= task.accumulatedTime
-      delete task.accumulatedTime
-    }
-    console.log(command, '// starting new task', task)
-    setTasks(updatedTasks)
-  }
-
-  const nextTask = (command, taskId) => {
-    // end any task in progress
-    endTask(command)
-
-    // start next available task or use taskId
-    startTask(command, taskId)
-  }
-
-  const pauseTask = (command, taskId) => {
-    const updatedTasks = [...tasks]
-    const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => t.startTime && !t.endTime)
-
-    if (!task) {
-      console.log(command, '// could not find a task to pause, ignoring command', taskId)
-      return
-    }
-
-    if (!task.startTime) {
-      console.log(command, `// task has not been started`, {
-        taskId,
-        task
-      })
-      return
-    }
-
-    task.accumulatedTime = Date.now() - task.startTime
-    delete task.startTime
-    console.log(command, `// pausing task`, {
-      taskId,
-      task
-    })
-    setTasks(updatedTasks)
-  }
-
-  const endTask = (command, taskId) => {
-    const updatedTasks = [...tasks]
-    const task = taskId ? updatedTasks[taskId - 1] : updatedTasks.find(t => t.startTime && !t.endTime)
-
-    if (!task) {
-      console.log(command, '// could not find a task to end', taskId)
-      return
-    }
-
-    if (task.accumulatedTime) {
-      task.startTime = Date.now() - task.accumulatedTime
-    }
-
-    if (!task.startTime) {
-      console.log(command, `// task has not been started`, {
-        taskId,
-        task
-      })
-      return
-    }
-
-    task.endTime = Date.now()
-    console.log(command, `// ending task`, {
-      taskId,
-      task
-    })
-    setTasks(updatedTasks)
-  }
-
-  const titleTask = (command, title) => {
-    setTitle(title)
-  }
-
-  const addNewTask = (command, name) => {
-    if (command === "add") {
-      setTasks([
-        ...tasks,
-        {
-          name
-        }
-      ])
-    }
-  }
-
-  const editTask = (command, taskId, name) => {
-    const updatedTasks = [...tasks]
-    const task = taskId ? updatedTasks[taskId - 1] : false
-
-    if (!task) {
-      console.log(command, `// task ${taskId} does not exist`)
-      return
-    }
-
-    task.name = name
-    console.log(command, `// editing task`, {
-      taskId,
-      task
-    })
-    setTasks(updatedTasks)
-  }
-
-  const moveTask = (command, fromTaskId, toTaskId) => {
-    const fromTask = tasks.find((t, i) => i+1 === Number(fromTaskId))
-
-    if (!fromTask) {
-      console.log(message, `Could not find fromTaskId ${fromTaskId}`)
-      return
-    }
-
-    const toTask = tasks.find((t, i) => i+1 === Number(toTaskId))
-
-    if (!toTask) {
-      console.log(message, `Could not find toTaskId ${toTaskId}`)
-      return
-    }
-
-    const updatedTasks = tasks.map((task, index) => {
-      if (index + 1 === Number(fromTaskId)) {
-        return toTask
-      }
-      if (index + 1 === Number(toTaskId)) {
-        return fromTask
-      }
-
-      return task
-    })
-    setTasks(updatedTasks)
-  }
-
-  const sortTask = (command) => {
-    // 1: all completed tasks
-    const completedTasks = []
-    // 2: in progress tasks
-    const inProgressTasks = []
-    // 3: non-started tasks
-    const toDoTasks = []
-
-    tasks.forEach((task) => {
-      if (task.endTime) {
-        completedTasks.push(task)
-      }
-      else if (task.startTime) {
-        inProgressTasks.push(task)
-      }
-      else {
-        toDoTasks.push(task)
-      }
-    })
-
-    setTasks(
-      completedTasks
-      .concat(inProgressTasks)
-      .concat(toDoTasks)
-    )
-  }
-
-  const resetTask = (command, taskId) => {
-    const task = tasks[taskId - 1]
-
-    if (!task) {
-      console.log(command, "// could not find task", taskId)
-      return
-    }
-
-    setTasks(tasks.map((t, index) => Number(taskId) === index + 1 ? ({ name: task.name }) : t))
-  }
-
-  const clearTask = (command, taskId) => {
-    // clear all completed
-    if (!taskId) {
-      setTasks(tasks.filter(task => !task.endTime))
-      return
-    }
-
-    setTasks(tasks.filter((task, index) => Number(taskId) !== index + 1))
-  }
-
   const handleTask = (message) => {
     // message examples:
     //   !task start [taskId]
@@ -317,47 +124,17 @@ export default function Home() {
       args
     })
 
-    if (command === 'start') {
-      startTask(command, args[0])
-      return
-    }
-    if (command === 'add') {
-      addNewTask(command, args.join(" "))
-      return
-    }
-    if (command === 'pause') {
-      pauseTask(command, args[0])
-      return
-    }
-    if (command === 'end') {
-      endTask(command, args[0])
-      return
-    }
-    if (command === 'edit') {
-      editTask(command, args[0], args.slice(1).join(" "))
-    }
-    if (command === 'next') {
-      nextTask(command, args[0])
-      return
-    }
-    if (command === 'move' || command === 'swap') {
-      moveTask(command, args[0], args[1])
-      return
-    }
-    if (command === 'sort') {
-      sortTask(command)
-      return
-    }
-    if (command === 'reset') {
-      resetTask(command, args[0])
-      return
-    }
-    if (command === 'title') {
-      titleTask(command, args.join(" "))
-      return
-    }
-    if (command === 'clear') {
-      clearTask(command, args[0])
+    if (taskHandlers.hasOwnProperty(command)) {
+      const runCommand = taskHandlers[command]
+
+      runCommand({
+        command,
+        args,
+        title,
+        setTitle,
+        tasks,
+        setTasks
+      })
       return
     }
     
@@ -474,7 +251,7 @@ export default function Home() {
                 const taskId = index + 1
 
                 return (
-                  <li key={task.name} className="flex items-center justify-between">
+                  <li key={taskId} className="flex items-center justify-between">
                     <span className="status-icon">
                       {status.isToDo && (
                         <span><i className="far fa-circle opacity-30 mr-2" /></span>

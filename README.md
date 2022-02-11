@@ -35,6 +35,7 @@ Height: 400
 - [x] `!task clear [taskId]` removes taskId or all completed tasks from list
 - [x] `!task title Title of the List` changes the title of the list on screen
 - [x] Saved to localStorage (enabled by default)
+- [x] Custom task commands can be added in `taskHandlers/index.js`
 - [x] Configuration: Command Name, Allow Mods, Title Text, Scale, Vertical Align
 - [ ] Configuration: Colors, Font Family
 - [ ] Configuration UI
