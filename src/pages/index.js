@@ -193,6 +193,13 @@ export default function Home() {
     setTasks(updatedTasks)
   }
 
+  const titleTask = (command, title) => {
+    setConfig({
+      ...config,
+      title
+    })
+  }
+
   const addNewTask = (command, name) => {
     if (command === "add") {
       setTasks([
@@ -344,6 +351,10 @@ export default function Home() {
     }
     if (command === 'reset') {
       resetTask(command, args[0])
+      return
+    }
+    if (command === 'title') {
+      titleTask(command, args.join(" "))
       return
     }
     if (command === 'clear') {

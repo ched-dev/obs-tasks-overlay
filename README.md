@@ -33,6 +33,7 @@ Height: 400
 - [x] `!task sort` sorts the tasks by completed, in progress, remaining
 - [x] `!task reset taskId` resets the task to incomplete with no time
 - [x] `!task clear [taskId]` removes taskId or all completed tasks from list
+- [x] `!task title Title of the List` changes the title of the list on screen
 - [x] Saved to localStorage (enabled by default)
 - [x] Configuration: Command Name, Allow Mods, Title Text, Scale, Vertical Align
 - [ ] Configuration: Colors, Font Family
