@@ -5,7 +5,7 @@
 
 ```
 OBS Browser Source URL: 
-https://obs-tasks-overlay.vercel.app/?channelName=ched_dev&title=Stream%20Tasks&scale=2&verticalAlign=middle
+https://obs-tasks-overlay.vercel.app/?channelName=ched_dev&scale=2&verticalAlign=middle
 Width: 800
 Height: 800
 ```
@@ -14,7 +14,7 @@ Height: 800
 
 ```
 OBS Browser Source URL: 
-https://obs-tasks-overlay.vercel.app/?channelName=ched_dev&title=Stream%20Tasks&scale=1.2
+https://obs-tasks-overlay.vercel.app/?channelName=ched_dev&scale=1.2
 Width: 400
 Height: 400
 ```
@@ -65,10 +65,6 @@ Set the command you wish to listen for. We use `!task` by default. No spaces all
 
 Allow mods to run the `!task` commands on your behalf. Defaults `false`.
 
-> title=Title Text
-
-Show a Title above the task list
-
 > scale=2
 
 Scale of the text on the page. Defaults to `1`, increments by `.1`. E.g. `1.4` is valid
@@ -79,7 +75,7 @@ Vertically aligns the list within your OBS browser source window. Options are `t
 
 **Fully Configured Example URL:**
 ```
-https://obs-tasks-overlay.vercel.app/?channelName=ched_dev&title=Stream%20Tasks&scale=2&verticalAlign=middle
+https://obs-tasks-overlay.vercel.app/?channelName=ched_dev&scale=2&verticalAlign=middle
 ```
 
 ## Getting Setup for Development

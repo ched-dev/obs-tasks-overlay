@@ -30,7 +30,6 @@ const defaultConfig = {
   command: "!task",
   channelName: null,
   allowMods: false,
-  title: null,
   scale: 1,
   verticalAlign: 'top'
 }
@@ -45,9 +44,12 @@ const applyScale = (scale) => {
 
 export default function Home() {
   let initialTasks = []
+  let initialTitle
   if (typeof window !== 'undefined') {
     initialTasks = JSON.parse(localStorage.getItem('obs-tasks') || '[]')
+    initialTitle = JSON.parse(localStorage.getItem('obs-tasks-title'))
   }
+  const [title, setTitle] = useState(initialTitle)
   const [tasks, setTasks] = useState(initialTasks)
   const [error, setError] = useState()
   const [config, setConfig] = useState(defaultConfig)
@@ -194,10 +196,7 @@ export default function Home() {
   }
 
   const titleTask = (command, title) => {
-    setConfig({
-      ...config,
-      title
-    })
+    setTitle(title)
   }
 
   const addNewTask = (command, name) => {
@@ -436,6 +435,13 @@ export default function Home() {
     }
   }, [tasks])
 
+  // save title to localstorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('obs-tasks-title', JSON.stringify(title))
+    }
+  }, [title])
+
   return (
     <div className="h-full text-white flex">
       <Head>
@@ -453,7 +459,7 @@ export default function Home() {
 
         {!error && !loading && (
           <section className="animate-fade-in">
-            {config.title && <h1 className="text-xl">{config.title}</h1>}
+            <h1 className="text-xl">{title || "Stream Tasks"}</h1>
             <ul className="my-3 w-full">
               {tasks.length === 0 && <em className="block text-center opacity-50">None yet.</em>}
               {tasks.map((task, index) => (
