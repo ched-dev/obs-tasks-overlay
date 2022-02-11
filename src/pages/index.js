@@ -477,7 +477,7 @@ export default function Home() {
                   <li key={task.name} className="flex items-center justify-between">
                     <span className="status-icon">
                       {status.isToDo && (
-                        <span><i className="far fa-circle text-gray-700 mr-2" /></span>
+                        <span><i className="far fa-circle opacity-30 mr-2" /></span>
                       )}
                       {status.isInProgress && (
                         <span><i className="fas fa-circle text-red-700 mr-2 animate-pulse" /></span>
@@ -486,7 +486,7 @@ export default function Home() {
                         <span><i className="fas fa-check text-green-600 mr-2" /></span>
                       )}
                       {status.isPaused && (
-                        <span><i className="far fa-pause-circle text-gray-700 mr-2" /></span>
+                        <span><i className="far fa-pause-circle opacity-30 mr-2" /></span>
                       )}
                     </span>
                     <span className="opacity-30 mr-2">{taskId}</span>
