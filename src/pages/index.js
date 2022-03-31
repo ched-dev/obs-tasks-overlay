@@ -28,19 +28,23 @@ const streamTasks = [
 ]
 
 const defaultConfig = {
-  command: "!task",
+  command: '!task',
   channelName: null,
   allowMods: false,
-  allowedUsers: "",
+  allowedUsers: '',
   scale: 1,
-  verticalAlign: 'top'
+  verticalAlign: 'top',
+  fontFamily: 'sans-serif',
+  fontColor: 'white'
 }
 
-const applyScale = (scale) => {
-  const el = document.querySelector('html')
+const applyStyles = (config) => {
+  const root = document.querySelector('body')
   
-  el.style = `
-    font-size: ${scale}em;
+  root.style = `
+    font-size: ${config.scale}em;
+    font-family: ${config.fontFamily};
+    color: ${config.fontColor};
   `
 }
 
@@ -106,8 +110,8 @@ export default function Home() {
       return
     }
 
-    // apply config
-    applyScale(config.scale)
+    // apply config styles
+    applyStyles(config)
 
     setError(null)
   }, [config, loading])
@@ -231,7 +235,7 @@ export default function Home() {
   })
 
   return (
-    <div className="h-full text-white flex">
+    <div className="h-full flex">
       <Head>
         <title>OBS Tasks Overlay</title>
         <link rel="icon" href="/favicon.ico" />
@@ -247,7 +251,9 @@ export default function Home() {
 
         {!error && !loading && (
           <section className="animate-fade-in">
-            <h1 className="text-xl">{title || "Stream Tasks"}</h1>
+            {title && (
+              <h1 className="text-xl text-inherit">{title}</h1>
+            )}
             <ul className="my-3 w-full">
               {tasks.length === 0 && <em className="block text-center opacity-50">None yet.</em>}
               {tasks.map((task, index) => {
