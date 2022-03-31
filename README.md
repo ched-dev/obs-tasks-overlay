@@ -36,7 +36,7 @@ Height: 400
 - [x] `!task title Title of the List` changes the title of the list on screen
 - [x] Saved to localStorage (enabled by default)
 - [x] Custom task commands can be added in `taskHandlers/index.js`
-- [x] Configuration: Command Name, Allow Mods, Title Text, Scale, Vertical Align
+- [x] Configuration: Command Name, Allow Mods, Allowed Users List, Title Text, Scale, Vertical Align
 - [ ] Configuration: Colors, Font Family
 - [ ] Configuration UI
 
@@ -65,6 +65,10 @@ Set the command you wish to listen for. We use `!task` by default. No spaces all
 > allowMods=true
 
 Allow mods to run the `!task` commands on your behalf. Defaults `false`.
+
+> allowedUsers=Streamlabs,Nightbot
+
+Allow specific users to run the `!task` commands on your behalf. Defaults empty.
 
 > scale=2
 

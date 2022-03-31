@@ -31,6 +31,7 @@ const defaultConfig = {
   command: "!task",
   channelName: null,
   allowMods: false,
+  allowedUsers: "",
   scale: 1,
   verticalAlign: 'top'
 }
@@ -80,6 +81,7 @@ export default function Home() {
     newConfig.allowMods = ['true', '1'].includes(newConfig.allowMods)
     newConfig.scale = Number(newConfig.scale)
     newConfig.command = newConfig.command.trim()
+    newConfig.allowedUsers = (newConfig.allowedUsers || "").split(",").filter(Boolean)
 
     setConfig(newConfig)
     console.log('setConfig', newConfig)
@@ -188,9 +190,11 @@ export default function Home() {
 
       if (
           // is broadcaster
-          tags.badges && tags.badges.broadcaster ||
+          (tags.badges && tags.badges.broadcaster) ||
           // is a moderator and mods allowed
-          tags.mod && config.allowMods
+          (tags.mod && config.allowMods) ||
+          // in allowedUsers list
+          (Array.isArray(config.allowedUsers) && config.allowedUsers.includes(tags.username))
         ) {
         if (cleanedMessage.toLowerCase().startsWith(`${config.command} `)) {
           triggerTask.current(cleanedMessage)
