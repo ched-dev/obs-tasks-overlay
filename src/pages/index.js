@@ -39,7 +39,7 @@ const defaultConfig = {
 }
 
 const applyStyles = (config) => {
-  const root = document.querySelector('body')
+  const root = document.querySelector('html')
   
   root.style = `
     font-size: ${config.scale}em;
