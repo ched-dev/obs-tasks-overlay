@@ -71,7 +71,7 @@ Allow specific users to run the `!task` commands on your behalf. Defaults empty.
 
 > fontFamily="PT Mono",monospace
 
-Change the font family for all text on the page. Accepts a standard css `font-family` value. Defaults `sans-serif`.
+Change the font family for all text on the page. Accepts a standard css `font-family` value. The font must be installed on your OBS machine to work. Defaults `sans-serif`.
 
 > fontColor=crimson
 
